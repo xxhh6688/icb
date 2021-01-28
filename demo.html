@@ -1,0 +1,756 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <title>ykpow</title>
+    <!--js start-->
+    <script src="/Scripts/jquery-3.3.1.min.js" type="text/javascript"></script>
+    <script src="/Scripts/vue.js" type="text/javascript"></script>
+    <script src="/Scripts/imageCommentPlayer.js?t=202101042250" type="text/javascript"></script>
+    <script src="/Scripts/utility.js" type="text/javascript"></script>
+    <script src="/Scripts/jmd5.js" type="text/javascript"></script>
+    <script src="/Scripts/azstore.js" type="text/javascript"></script>
+    <script src="/Scripts/azure-storage.blob.min.js" type="text/javascript"></script>
+    <script src="/Scripts/crop.js" type="text/javascript"></script>
+    <link href="/css/ykui.css" rel="stylesheet" />
+    <link href="/css/all.css" rel="stylesheet" />
+    <link href="/css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="z-index:101;background-color:#ffffff;height:60px;position:fixed;display:flex;top:0;left:0;right:0;align-items:center;width:100%;box-shadow:0 0 10px #cccccc">
+        <div style="flex:0 0 auto;width:200px;height:60px;display:flex;align-items:center;padding-left:20px;">
+            <a href="#pow"><span>HOME</span></a>
+        </div>
+        <div class="search-bar-box">
+            <div class="search-bar">
+                <input type="text" placeholder="search something ...">
+                <div class="search-btn"><i class="fas fa-search"></i></div>
+            </div>
+        </div>
+        <div class="add-image-box">
+            <a href="javascript:void(0)" class="icon-btn" onclick="addImageVm.show=true">
+                <i class="fas fa-camera-retro"></i>
+                <span>上传</span>
+            </a>
+        </div>
+        <div style="flex:0 0 auto;width:100px;height:60px;display:flex;align-items:center;justify-content:center;">
+            <a href="javascript:void(0)" onclick="loginVM.show=true">
+                <span>登录</span>
+            </a>
+        </div>
+        <div style="flex:0 0 auto;width:100px;height:60px;display:flex;align-items:center;padding-right:20px;">
+            <a href="#pow/me">
+                <span>我</span>
+            </a>
+        </div>
+    </div>
+    <div style="display:flex;justify-content:center;" id="image-water-fall-box" v-if="show">
+        <div style="position:relative;margin-top:80px;" id="image-water-fall" v-bind:style="{width:waterFallImage.containerWidth+'px',height:waterFallImage.getDocumentHeight()+'px'}">
+        </div>
+    </div>
+    <div id="user-setting" v-if="show" style="margin-top:60px;">
+        <div class="input-box">
+            <div class="input-box-label">user photo</div>
+            <div>
+                <img style="width:120px;height:120px;" src="https://th.bing.com/th/id/OIP.k6V8n31jhsNraAUlXqwNgQHaHa?w=180&h=180&c=7&o=5&dpr=2&pid=1.7" />
+            </div>
+            <div style="margin-top:20px;width:120px;text-align:center;">
+                <a href="javascript:void(0)" v-on:click="changeUserPhoto()"><span>更改</span></a>
+            </div>
+        </div>
+        <div class="input-box">
+            <div class="input-box-label">user id</div>
+            <input type="text" placeholder="text" readonly>
+        </div>
+        <div class="input-box">
+            <div class="input-box-label">user id</div>
+            <input type="text" placeholder="text" readonly>
+        </div>
+        <div class="input-box">
+            <div class="input-box-label">description</div>
+            <textarea></textarea>
+        </div>
+        <div class="input-box">
+            <div class="input-box-label">password</div>
+            <input type="text" placeholder="text" readonly>
+        </div>
+        <div style="display:flex;align-items:center;height:80px;justify-content:flex-end;padding-right:20px;">
+            <a href="javascript:void(0)" class="btn btn-pri">
+                <span>确定</span>
+            </a>
+        </div>
+    </div>
+    <div id="user-images" v-if="show" style="margin-top:60px;">
+        <div style="position:relative;margin-top:80px;" id="image-water-fall" v-bind:style="{width:waterFallImage.containerWidth+'px',height:waterFallImage.getDocumentHeight()+'px'}">
+        </div>
+    </div>
+    <div id="follow-user" style="margin-top:60px;" v-if="show">
+        <div style="position:sticky;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:center;">
+            <div class="search-bar">
+                <input type="text" placeholder="search user ...">
+                <div class="search-btn"><i class="fas fa-search"></i></div>
+            </div>
+        </div>
+        <div style="margin-bottom:60px;" class="row">
+            <div class="col-lg-2" v-for="u in users" style="padding:20px;">
+                <div>
+                    <a href="#pow/user/images">
+                        <img v-bind:src="u.image" style="width:100px;height:100px;border-radius:50%" />
+                    </a>
+                </div>
+                <div>
+                    <a href="#pow/user/images">
+                        <span>{{u.name}}</span>
+                    </a>
+                </div>
+                <div>
+                    <span>follow: 10k</span>
+                </div>
+                <div>
+                    <span>last update: 10k</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="user-menu" style="margin-top:60px" v-if="show">
+        <a href="#pow/me">
+            <div class="user-menu-item">
+                <span class="fas fa-camera-retro"></span><span>用户设置</span>
+            </div>
+        </a>
+        <a href="#pow/me/follow">
+            <div class="user-menu-item">
+                <span class="fas fa-camera-retro"></span><span>我的关注</span>
+            </div>
+        </a>
+        <a href="#pow/me/images">
+            <div class="user-menu-item">
+                <span class="fas fa-camera-retro"></span><span>我的图库</span>
+            </div>
+        </a>
+        <a href="#pow/me/history">
+            <div class="user-menu-item">
+                <span class="fas fa-camera-retro"></span><span>查看历史</span>
+            </div>
+        </a>
+        <a href="#pow/me/favor">
+            <div class="user-menu-item">
+                <span class="fas fa-camera-retro"></span><span>最爱</span>
+            </div>
+        </a>
+        <div class="user-menu-item">
+            <span class="fas fa-camera-retro"></span><span>我的消息</span>
+        </div>
+        <div class="user-menu-item">
+            <span class="fas fa-camera-retro"></span><span>退出平台</span>
+        </div>
+    </div>
+    <div id="bottom-navi-bar">
+        <div class="f_c" style="height:60px;flex:1 1 auto;">
+            <span>发现</span>
+        </div>
+        <div class="f_c" style="height:60px;flex:1 1 auto;cursor:pointer" onclick="addImageVm.show=true">
+            <span class="fas fa-camera-retro"></span>
+        </div>
+        <a href="#pow/me" style="flex:1 1 auto;">
+            <div class="f_c" style="height:60px;">
+                <span>我</span>
+            </div>
+        </a>
+    </div>
+    <div class="dialog" id="add-image-dialog" v-if="show">
+        <div class="dialog-bk"></div>
+        <div class="dialog-inner">
+            <div class='dialog-bar'>
+                <span>添加图片</span>
+                <div class='dialog-bar-close' v-on:click='show=false'><i class='fas fa-times'></i></div>
+            </div>
+            <div class="dialog-contentpane">
+                <div style="width:100%;height:300px;;background-color:#f3f3f3;display:flex;align-items:center;justify-content:center">
+                    <a href="javascript:void(0)" class="btn btn-pri"><span>添加图片</span></a>
+                </div>
+                <div style="margin-top:20px;">
+                    <textarea style="width:100%;" rows="5"></textarea>
+                </div>
+                <div style="height:60px;display:flex;align-items:center;justify-content:center">
+                    <a href="javascript:void(0)" class="btn btn-pri">
+                        <span>提交</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog" id="login-dialog" v-if="show">
+        <div class="dialog-bk"></div>
+        <div class="dialog-inner">
+            <div class='dialog-bar'>
+                <span>登录</span>
+                <div class='dialog-bar-close' v-on:click='show=false'><i class='fas fa-times'></i></div>
+            </div>
+            <div class="dialog-contentpane">
+                <div class="login-box">
+                    <input type="text" placeholder="身份标识" />
+                    <input type="password" placeholder="密码" />
+                    <input type="button" value="登录" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="user-image-setting" class="dialog" style="display:none;">
+        <div class="dialog-bk">
+        </div>
+        <div class="dialog-inner">
+            <div class="dialog-bar">
+                <span>更改头像</span>
+                <div class="dialog-bar-close" onclick="myCroppie.closeUserPhotoDialog()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="dialog-contentpane" style="padding: 16px;">
+                <a href="javascript:void(0)" class="btn btn-pri" onclick="uploadfileBlob2()"><span>上传图片</span></a>
+                <div id="user-photo-demo" style="width:300px;height:300px;margin-top:20px;"></div>
+                <div style="margin-top:60px;" id="confirm-use-user-photo" class="hide">
+                    <a href="javascript:void(0)" class="btn btn-pri" onclick="myCroppie.uploadUserCroppie()"><span>确定使用</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display:none;">
+        <form id="uploadformBlob" enctype="multipart/form-data" method="post" action="">
+            <input autocomplete="off" type="file" class="" name="fileToUploadBlob" id="fileToUploadBlob" onchange="fileSelectedBlob();" />
+            <input autocomplete="off" type="file" class="" name="fileToUploadBlob2" id="fileToUploadBlob2" onchange="myCroppie.initUserPhoto()" />
+            <input autocomplete="off" type="file" class="" name="fileToServer" id="fileToServer" onchange="uploadFileToServerCallback()" />
+        </form>
+    </div>
+    <script>
+        let config = {
+            documentPadding: 20
+        };
+        let waterFallImage = {
+            images: [],
+            calcImages: [],
+            padding: 20,
+            allowColumnCount: 6,
+            containerWidth: 1000,
+            columns: {
+                col1: {
+                    height: 0,
+                    items: [],
+                },
+                col2: {
+                    height: 0,
+                    items: [],
+                },
+                col3: {
+                    height: 0,
+                    items: [],
+                },
+                col4: {
+                    height: 0,
+                    items: [],
+                },
+                col5: {
+                    height: 0,
+                    items: [],
+                },
+                col6: {
+                    height: 0,
+                    items: [],
+                },
+                col7: {
+                    height: 0,
+                    items: [],
+                },
+                col8: {
+                    height: 0,
+                    items: [],
+                },
+            },
+            clearColumn: function () {
+                let self = this;
+                for (var i = 1; i <= 8; i++) {
+                    self.columns[`col${i}`].items.splice(0, self.columns[`col${i}`].items.length);
+                    self.columns[`col${i}`].height = 0;
+                }
+
+                $("#image-water-fall").empty();
+            },
+            addImage: function (img) {
+                let self = this;
+                self.images.push(img);
+                self.addColumnImage(img);
+                
+            },
+            addColumnImage: function (img) {
+                let self = this;
+                let col = self.columns[`col1`];
+                for (var i = 1; i <= self.allowColumnCount; i++) {
+                    if (col.height > self.columns[`col${i}`].height) {
+                        col = self.columns[`col${i}`];
+                    }
+                }
+
+                let item = {
+                    id: 0,
+                    url: img.url,
+                    ratio: img.ratio,
+                    translateY: col.height,
+                    realWidth: img.width,
+                    realHeight:img.height
+                };
+                col.items.push(item);
+                let itemWidth = Math.floor((self.containerWidth + self.padding) / self.allowColumnCount) - self.padding;
+                let itemHeight = Math.floor(itemWidth / img.ratio);
+                col.height = col.height + itemHeight + self.padding;
+            },
+            calcImagesList: function () {
+                let self = this;
+                let top = $(document).scrollTop();
+                let bottom = top + $(window).height();
+                let buffer = 300;
+                let itemWidth = Math.floor((self.containerWidth + self.padding) / self.allowColumnCount) - self.padding;
+                $("#image-water-fall").empty();
+                for (var i = 1; i <= self.allowColumnCount; i++) {
+                    for (var j = 0; j < self.columns[`col${i}`].items.length; j++) {
+                        let t = self.columns[`col${i}`].items[j];
+                        
+                        let item = {
+                            url: t.url,
+                            width: itemWidth,
+                            height: Math.floor(itemWidth / t.ratio),
+                            translateX: (i - 1) * (self.padding + itemWidth),
+                            translateY: t.translateY,
+                            realWidth: t.realWidth,
+                            realHeight: t.realHeight
+                        };
+                        if (item.translateY > top - buffer && item.translateY < bottom + buffer) {
+                            let ele =
+                                "<div class='image-box' tx='{2}' ty='{3}' style='position:absolute;top:0;left:0;background-color:#808080;width:{0}px;height:{1}px;transform:translate({2}px,{3}px)'>".format(item.width, item.height, item.translateX, item.translateY) +
+                                " <img src='{0}' style='width:100%;cursor:pointer' onclick='popupImage(this)' w='{1}' h='{2}' tx='{3}' ty='{4}' />".format(item.url, item.realWidth, item.realHeight, item.translateX, item.translateY) +
+                                "</div>";
+                            if (!self.checkExistVisibleImageElement(item)) {
+                                $("#image-water-fall").append(ele);
+                            }
+                        }
+                        else if (item.translateY > bottom + buffer) {
+                            break;
+                        }
+                    }
+                }
+
+                self.removeInvisibleImageElement(top, bottom, buffer);
+            },
+            checkExistVisibleImageElement: function (item) {
+                let self = this;
+                let exist = false;
+                $(".image-box").each(function (a, b) {
+                    if ($(b).attr('tx') == item.translateX && $(b).attr('ty') == item.translateY) {
+                        exist = true;
+                        return false;
+                    }
+                });
+                return exist;
+            },
+            removeInvisibleImageElement: function (top, bottom, buffer) {
+                let self = this;
+                $(".image-box").each(function (a, b) {
+                    if ($(b).attr('ty') < top - buffer || $(b).attr('ty') > bottom + buffer) {
+                        $(b).remove();
+                    }
+                });
+            },
+            getDocumentHeight: function () {
+                let self = this;
+                let height = 0;
+                for (var i = 1; i <= self.allowColumnCount; i++) {
+                    if (self.columns[`col${i}`].height > height) {
+                        height = self.columns[`col${i}`].height;
+                    }
+                }
+
+                return height;
+            },
+            calcVisiableColumnCount: function () {
+                let self = this;
+                let width = $(window).width();
+                waterFallImage.containerWidth = width - config.documentPadding * 2;
+                if (width > 1400) {
+                    waterFallImage.allowColumnCount = 6;
+                }
+                else if (width > 1000) {
+                    waterFallImage.allowColumnCount = 5;
+                }
+                else if (width > 800) {
+                    waterFallImage.allowColumnCount = 4;
+                }
+                else if (width > 600) {
+                    waterFallImage.allowColumnCount = 3;
+                }
+                else if (width > 400) {
+                    waterFallImage.allowColumnCount = 2;
+                }
+                else {
+                    waterFallImage.allowColumnCount = 1;
+                }
+            }
+        };
+        let imageVm = new Vue({
+            el: '#image-water-fall-box',
+            data: {
+                show: false,
+                waterFallImage: waterFallImage,
+            },
+            watch: {
+            },
+            created: function () {
+            },
+            methods: {
+                init: function () {
+                    let self = this;
+                    Vue.nextTick(function () {
+                        waterFallImage.clearColumn();
+                        for (var i = 0; i < 40; i++) {
+                            waterFallImage.addImage({
+                                id: 0,
+                                url: 'https://th.bing.com/th/id/OIP.WM9ooxc349iBhYwkEG9O8wHaI5?w=165&h=199&c=7&o=5&dpr=2&pid=1.7',
+                                ratio: 125 / 151,
+                                width: 125,
+                                height:151
+                            });
+                            waterFallImage.addImage({
+                                id: 0,
+                                url: 'https://th.bing.com/th/id/OIP.EuPS7qUs89HNAUjJuvHy_QHaE8?w=263&h=180&c=7&o=5&dpr=2&pid=1.7',
+                                ratio: 462 / 316,
+                                width: 462,
+                                height:316
+                            });
+                            waterFallImage.addImage({
+                                id: 0,
+                                url: 'https://th.bing.com/th/id/OIP.0Eztdk7n3yPrAf910e6vyAHaEK?w=325&h=183&c=7&o=5&dpr=2&pid=1.7',
+                                ratio: 473 / 266,
+                                width: 473,
+                                height:266
+                            });
+                            waterFallImage.addImage({
+                                id: 0,
+                                url: 'https://th.bing.com/th/id/OIP._x6YQWKDyh8alIBKZo2ZeAHaEo?w=293&h=183&c=7&o=5&dpr=2&pid=1.7',
+                                ratio: 1620 / 938,
+                                width: 1620,
+                                height:938
+                            });
+                            waterFallImage.addImage({
+                                id: 0,
+                                url: 'https://th.bing.com/th/id/OIP.SRN146jjUh-ISbudhKl_fwHaHa?pid=Api&w=690&h=690&rs=1',
+                                ratio: 690 / 690,
+                                width: 690,
+                                height:690
+                            });
+                        }
+
+                        waterFallImage.calcImagesList();
+                    });
+                },
+            }
+        });
+        let userImageVM = new Vue({
+            el: "#user-images",
+            data: {
+                show: false,
+                waterFallImage: waterFallImage,
+            },
+            methods: {
+                init: function () {
+                    let self = this;
+                    Vue.nextTick(function () {
+                        waterFallImage.clearColumn();
+                        for (var i = 0; i < 40; i++) {
+                            waterFallImage.addImage({
+                                id: 0,
+                                url: 'https://th.bing.com/th/id/OIP.SRN146jjUh-ISbudhKl_fwHaHa?pid=Api&w=690&h=690&rs=1',
+                                ratio: 690 / 690,
+                            });
+                        }
+
+                        waterFallImage.calcImagesList();
+                    });
+                },
+            }
+        });
+        let addImageVm = new Vue({
+            el: "#add-image-dialog",
+            data: {
+                show: false,
+            },
+            methods: {}
+        });
+        let userSettingVm = new Vue({
+            el: "#user-setting",
+            data: {
+                show: false,
+                azStore: azStoreFactory.create()
+            },
+            methods: {
+                changeUserPhoto: function () {
+                    let self = this;
+                    self.azStore.container = "images";
+                    myCroppie.callback = function (data) {
+
+                    };
+                    myCroppie.openUserPhotoDialog();
+                },
+            }
+        });
+        let loginVM = new Vue({
+            el: "#login-dialog",
+            data: {
+                show: false,
+            },
+            methods: {}
+        });
+        let userMenuVM = new Vue({
+            el: "#user-menu",
+            data: {
+                show: false
+            },
+            methods: {
+
+            }
+        });
+        let followUserVM = new Vue({
+            el: "#follow-user",
+            data: {
+                show: false,
+                users: []
+            },
+            methods: {
+                init: function () {
+                    let self = this;
+                    self.users.splice(0, self.users.length);
+                    for (var i = 0; i < 20; i++) {
+                        self.users.push({
+                            id: 0,
+                            name: "James Bond",
+                            image: "https://th.bing.com/th/id/OIP.N9bRPO6mcIWh7rVKftAJdwHaFj?w=231&h=180&c=7&o=5&dpr=2&pid=1.7",
+                        });
+                    }
+                }
+            }
+        });
+        let myCroppie = {
+            instance: null,
+            callback: null,
+            uploadUserCroppie: function () {
+                let self = this;
+                self.instance.croppie('result', 'base64').then(function (base64) {
+                    $("#result").attr("src", base64);
+                    if (myCroppie.callback) {
+                        myCroppie.callback(base64);
+                    }
+                });
+            },
+            initUserPhoto: function () {
+                let self = this;
+                if (self.instance) {
+                    self.instance.croppie('destroy');
+                    self.instance = null;
+                }
+
+                readURL(myCroppie);
+                $("#confirm-use-user-photo").show();
+                $("#fileToUploadBlob2").val('');
+            },
+            openUserPhotoDialog: function () {
+                $("#user-image-setting").show();
+            },
+            closeUserPhotoDialog: function () {
+                let self = this;
+                $("#user-image-setting").hide();
+                $("#confirm-use-user-photo").hide();
+                if (self.instance) {
+                    self.instance.croppie('destroy');
+                    self.instance = null;
+                }
+            }
+        };
+        $(document).ready(function () {
+            waterFallImage.calcVisiableColumnCount();
+            waterFallImage.calcImagesList();
+            window.onhashchange = function () {
+                router.parse();
+            };
+            router.parse();
+        });
+        let reFillImageTimer = null;
+        $(window).resize(function (e) {
+            if (reFillImageTimer) {
+                clearTimeout(reFillImageTimer);
+            }
+
+            reFillImageTimer = setTimeout(function () {
+                waterFallImage.clearColumn();
+                waterFallImage.calcVisiableColumnCount();
+
+                for (var i = 0; i < waterFallImage.images.length; i++) {
+                    waterFallImage.addColumnImage(waterFallImage.images[i]);
+                }
+
+                waterFallImage.calcImagesList();
+            }, 500);
+        });
+        $(document).scroll(function (e) {
+            waterFallImage.calcImagesList();
+        });
+        function uploadfileBlob2() {
+            $("#fileToUploadBlob2").trigger("click");
+        }
+        function readURL(myCroppie) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var image = new Image();
+                image.onload = function (imageEvent) {
+                    var canvas = document.createElement('canvas'),
+                        max_size = 1024,
+                        width = image.width,
+                        height = image.height;
+                    if (width > height) {
+                        if (width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        }
+                    } else {
+                        if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                    var dataUrl = canvas.toDataURL('image/jpeg');
+
+                    var b = $('#user-photo-demo').croppie({
+                        url: dataUrl,
+                        viewport: {
+                            width: 150,
+                            height: 150
+                        }
+                    });
+                    if (myCroppie) {
+                        myCroppie.instance = b;
+                    }
+
+                };
+                image.src = e.target.result;
+            };
+
+            reader.readAsDataURL(document.getElementById('fileToUploadBlob2').files[0]);
+        }
+        var router = {
+            currentPage: null,
+            map: [
+                { "url": "", "page": imageVm },
+                { "url": "/setting", "page": userSettingVm },
+                { "url": "/me", "page": userMenuVM },
+                { "url": "/me/images", "page": userImageVM },
+                { "url": "/user/images", "page": userImageVM },
+                { "url": "/me/favor", "page": userImageVM },
+                { "url": "/me/history", "page": userImageVM },
+                { "url": "/me/follow", "page": followUserVM },
+            ],
+            getTargetPage: function () {
+                var self = this;
+                var path = window.location.hash.replace("#pow", "");
+                var page = null;
+                $.each(this.map, function (a, b) {
+                    var patts = '^' + b.url + '$';
+                    var patt = new RegExp(patts, "ig");
+                    if (patt.test(path) === true) {
+                        page = b.page;
+                        return false;
+                    }
+                });
+
+                return page;
+            },
+            parse: function () {
+                var self = this;
+                var path = window.location.hash;
+                var page = self.getTargetPage();
+                if (!page) {
+                    return;
+                }
+
+                if (self.currentPage && self.currentPage.path != path) {
+                    if (self.currentPage.cleanup) {
+                        self.currentPage.cleanup();
+                    }
+
+                    self.currentPage.show = false;
+                }
+
+                self.currentPage = page;
+                self.currentPage.path = path;
+                page.show = true;
+                document.title = page.title;
+                if (page.init) {
+                    console.log(`init page: ${path}`);
+                    if (page.init) {
+                        page.init();
+                    }
+                }
+            }
+        };
+        function popupImage(img) {
+            zoomInImage(img);
+            setTimeout(function () {
+                imgCommentButtonClick(img, zoomOutImage);
+            }, 500);
+        }
+
+        function zoomInImage(img) {
+            $("body").append("<div id='body-mask'></div>");
+            setTimeout(function () {
+                $("#body-mask").css("opacity", 1);
+            }, 10);
+            var width = $(img).width();
+            var height = $(img).height();
+            var realWidth = $(img).attr("w");
+            var tx = $(img).parents(".image-box").attr("tx");
+            var ty = $(img).parents(".image-box").attr("ty");
+            var screenWidth = $(window).width();
+            var screenHeight = $(window).height();
+            var x = screenWidth / 2 - width / 2;
+            var y = screenHeight / 2 - height / 2;
+            var scale = realWidth / width;
+            $(img).parents(".image-box").css("zIndex", 1003);
+            $(img).parents(".image-box").css("backgroundColor", "#ffffff");
+            var marginWindowLeft = $(img).parents(".image-box")[0].getBoundingClientRect().left;
+            var marginWindowTop = $(img).parents(".image-box")[0].getBoundingClientRect().top;
+            x = x - marginWindowLeft;
+            y = y - marginWindowTop;
+            console.log(`${x}, ${y}`);
+            $(img).css("transform", `translate(${x}px,${y}px) scale(${scale})`);
+            setTimeout(function () {
+                $("#body-mask").remove();
+                $(img).parents(".image-box").css("zIndex", 'unset');
+            }, 1000);
+        }
+
+        function zoomOutImage(img) {
+            $(img).parents(".image-box").css("zIndex", 1003);
+            $("body").append("<div id='body-mask'></div>");
+            $("#body-mask").css("opacity", 1);
+            setTimeout(function () {
+                $("#body-mask").css("opacity", 0);
+            }, 10);
+            $(img).css("transform", "translate(0px,0px) scale(1)");
+            setTimeout(function () {
+                $("#body-mask").remove();
+                $(img).parents(".image-box").css("zIndex", 'unset');
+            }, 500);
+        }
+    </script>
+</body>
+</html>

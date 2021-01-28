@@ -1,0 +1,69 @@
+<div id='main-box' class='unselectable'>
+    <div id='comment-dialog' v-if='showCommentDialog' class='dialog'>
+        <div class='dialog-bk'></div>
+        <div class='dialog-inner'>
+            <div class='dialog-bar'>
+                <span>add comment</span>
+                <div class='dialog-bar-close' v-on:click='showCommentDialog=false'><i class='fas fa-times'></i></div>
+            </div>
+            <div class='dialog-contentpane' style='padding:16px;'>
+                <div><textarea id='comment-text' style='width:100%;' rows=5></textarea></div>
+                <div><span>剩余字数:</span><span id='comment-text-length'></span></div>
+                <div><a href='javascript:void(0)' class='btn btn-pri' v-on:click='addComment()'>确定</a></div>
+            </div>
+        </div>
+    </div>
+    <div id='conversation-dialog' v-if='showConversationDialog.show' class='dialog'>
+        <div class='dialog-bk'></div>
+        <div class='dialog-inner'>
+            <div class='dialog-bar'>
+                <div class="back-btn">
+                    <span class="fas fa-chevron-left"></span>
+                </div>
+                <span>与user name的对话</span>
+                <div class='dialog-bar-close' v-on:click='closeConversation()'><i class='fas fa-times'></i></div>
+            </div>
+            <div class='dialog-contentpane' style='background-color:#ffffff;'>
+                <div id="conversation-user-list" v-bind:style="{zIndex:showConversationDialog.showDetail?100:101}">
+                    <div v-for="a in [1,2,3,4,5,6,7,8,9]" style="display:flex;align-items:flex-start;padding:10px 0">
+                        <img style="width:30px;height:30px;margin-right:20px;" src="https://th.bing.com/th/id/OIP.VJm1R1rWP29ueLqkV-L70gHaHa?w=209&h=208&c=7&o=5&dpr=2&pid=1.7" />
+                        <div style="height:60px;">
+                            <div style="margin-bottom:10px;">user name</div>
+                            <div class="ellipsis">
+                                <span style="color:#333333">message message message</span>
+</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="conversation-detail"  v-bind:style="{zIndex:showConversationDialog.showDetail?101:100}">
+                    <div style="display:flex;align-items:flex-start;justify-content:flex-start;margin-bottom:20px;" v-for="a in [1,2,3,4]">
+                        <img style="width:30px;height:30px;margin-right:20px;border-radius:50%;" src="https://th.bing.com/th/id/OIP.VJm1R1rWP29ueLqkV-L70gHaHa?w=209&h=208&c=7&o=5&dpr=2&pid=1.7" />
+                        <div style="margin-right:100px;padding:10px;background-color:#ffffff;border-radius:10px;">
+                            <span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;justify-content:flex-start;margin-bottom:20px;" v-for="a in [1,2,3,4]">
+                        <div style="margin-left:100px;padding:10px;background-color:#ffffff;border-radius:10px;">
+                            <span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span>
+                        </div>
+                        <img style="width:30px;height:30px;margin-left:20px;border-radius:50%;" src="https://th.bing.com/th/id/OIP.VJm1R1rWP29ueLqkV-L70gHaHa?w=209&h=208&c=7&o=5&dpr=2&pid=1.7" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id='image-comment-list-box' v-on:scroll='imageCommentsScroll()' v-if="imageShow">
+        <div v-for='ic in imageCommentList' style='padding:20px;' v-on:click='player.highlightItem(ic.id)'>
+            <div style='margin-bottom:4px;'><a href="javascript:void(0)" v-on:click="startConversation()"><span>user name</span></a></div>
+            <div>
+                <span>{{ic.text}}</span>
+            </div>
+        </div>
+    </div>
+    <div id='log-list-box' v-if='debug'>
+    </div>
+    <div id='image-container' v-if="imageShow"><img id='image' name='icb' v-bind:src='image.url' v-on:load='init()' /></div>
+    <div id='canvas-box' v-if="imageShow"><canvas id='myCanvas' width='1' height='1'></canvas></div>
+    <span style='position:absolute;top:10px;right:10px;cursor:pointer;z-index:101' 
+          v-on:click='close()' class="fas fa-times" v-if="imageShow"></span>
+</div>
